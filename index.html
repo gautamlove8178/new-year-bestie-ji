@@ -6,7 +6,6 @@
 <title>Marya 💖 — Happy New Year</title>
 
 <style>
-/* (your same CSS – no change) */
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Segoe UI',sans-serif;}
 .btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
@@ -14,18 +13,21 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Se
   font-size:clamp(1rem,5vw,1.8rem);cursor:pointer;border:none;border-radius:12px;
   background:#ff3399;color:#fff;z-index:20;box-shadow:0 0 25px #ff66aa;transition:0.3s;}
 .btn:active{transform:translate(-50%,-50%) scale(1.05);}
-#introGif,#finalGif{position:absolute;left:50%;transform:translateX(-50%);
+
+#introGif{position:absolute;left:50%;transform:translateX(-50%);
   border-radius:15px;box-shadow:0 0 20px #ff66aa;
-  opacity:0;transition:opacity 1.5s ease-in-out;z-index:19;max-width:90%;height:auto;}
-#introGif{top:72%;}#finalGif{bottom:3%;}
+  opacity:0;transition:opacity 1.5s ease-in-out;z-index:19;max-width:90%;height:auto;top:72%;}
+
 .slideshow{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;z-index:1;opacity:0;transition:opacity 2s ease-in-out;}
 .slideshow.active{opacity:1;}
 .slideshow video{width:100%;height:100%;object-fit:cover;}
+
 .stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2;
   background:transparent url("https://www.transparenttextures.com/patterns/stardust.png") repeat;
   filter:blur(0.5px);animation:moveStars 60s linear infinite;opacity:0;transition:opacity 2s;}
 .stars.active{opacity:1;}
 @keyframes moveStars{0%{background-position:0 0;}100%{background-position:-10000px 5000px;}}
+
 #messageBox{
   position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);
   color:#fff;text-align:center;font-size:clamp(1.2rem,6vw,2rem);
@@ -33,9 +35,29 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Se
   z-index:10;transition:opacity 1s ease-in-out;white-space:pre-line;line-height:1.9;font-weight:500;
 }
 #messageBox.show{opacity:1;}
-#messageBox.finale{font-size:clamp(1.8rem,7vw,2.8rem);
-  text-shadow:0 0 20px #ff99cc,0 0 40px #fff,0 0 60px #ff6699;}
-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;}
+
+#proposal{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  display:none;align-items:center;justify-content:center;z-index:30;
+}
+#proposal div{
+  color:#fff;font-size:28px;text-align:center;
+}
+
+#newyearFinal{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);
+  display:none;align-items:center;justify-content:center;z-index:35;
+  flex-direction:column;color:white;font-size:32px;text-align:center;
+}
+
+.smoke{
+  animation:smokeIn 3s ease forwards;
+}
+
+@keyframes smokeIn{
+  from{opacity:0;filter:blur(10px);transform:scale(.9)}
+  to{opacity:1;filter:blur(0);transform:scale(1)}
+}
 </style>
 </head>
 
@@ -56,7 +78,24 @@ canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5;pointer-even
 
 <div id="messageBox"></div>
 
+<!-- 🎶 music -->
 <audio id="bg-music" src="romantic.mp3"></audio>
+
+<!-- 💍 proposal -->
+<div id="proposal">
+  <div>
+    💍<br><br>
+    Marya,<br>
+    will you stay with me…<br>
+    every year, every version of me? ❤️
+  </div>
+</div>
+
+<!-- 🎉 final wish -->
+<div id="newyearFinal">
+  <div class="smoke">✨💖 HAPPY NEW YEAR MARYA 💖✨</div>
+  <div style="margin-top:20px;">— Love Gautam 💖</div>
+</div>
 
 <script>
 const turnOnBtn=document.getElementById("turnOnLight");
@@ -67,7 +106,7 @@ const bgMusic=document.getElementById("bg-music");
 const introGif=document.getElementById("introGif");
 const messageBox=document.getElementById("messageBox");
 
-/*  ✅ FIXED — missing comma added */
+/* ✔️ FIXED lines array — sab quotes/comma sahi */
 const lines=[
 `Marya,
 
@@ -102,13 +141,19 @@ bahut maze karein aur
 ghumte rahe puri duniya.`,
 
 `Ab tum bas mere pass jaldi aao,
-meri marya mera maa
+meri Marya, mera maa,
 tumhara baccha intezaar kar raha hai.`,
+
+`Happy New Year Marya…
+
+ek chhoti si wish aur —
+iss saal bhi mujhe mat bhoolna,
+kyunki main tumhe bilkul nahi bhool paata 💖`,
 
 `Marya,
 tum mere liye sab kuch ho.
 
-— Love Gautam`
+— Love Gautam 💖`
 ];
 
 /* typing effect */
@@ -125,10 +170,8 @@ function typeText(content){
 turnOnBtn.onclick=()=>{
   slideshow.classList.add("active");
   stars.classList.add("active");
-
   bgMusic.volume=0.8;
   bgMusic.play().catch(()=>{});
-
   turnOnBtn.style.display="none";
   startBtn.style.display="block";
   introGif.style.opacity=1;
@@ -143,15 +186,35 @@ startBtn.onclick=()=>{
 
 let currentIndex=0;
 
+/* ⭐ messages + proposal + final wish */
 function showMessage(){
-  if(currentIndex>=lines.length) return;
-  messageBox.classList.add("show");
-  typeText(lines[currentIndex]);
-  setTimeout(()=>{
-    messageBox.classList.remove("show");
-    currentIndex++;
-    setTimeout(showMessage,800);
-  },9000);
+  if(currentIndex<lines.length){
+    messageBox.classList.add("show");
+    typeText(lines[currentIndex]);
+
+    setTimeout(()=>{
+      messageBox.classList.remove("show");
+      currentIndex++;
+
+      if(currentIndex<lines.length){
+        setTimeout(showMessage,1000);
+      } else {
+
+        /* 💍 proposal */
+        setTimeout(()=>{
+          document.getElementById("proposal").style.display="flex";
+
+          /* 🎉 final wish after 5 sec */
+          setTimeout(()=>{
+            document.getElementById("proposal").style.display="none";
+            document.getElementById("newyearFinal").style.display="flex";
+          },5000);
+
+        },2000);
+      }
+
+    },10000);
+  }
 }
 
 function startTimeline(){
